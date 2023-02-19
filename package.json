@@ -1,0 +1,46 @@
+{
+  "name": "3d-heart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint src && prettier --check src",
+    "lint:fix": "eslint --fix src && prettier --write src",
+    "dev": "webpack serve --node-env development",
+    "build": "webpack --node-env production"
+  },
+  "dependencies": {
+    "three": "^0.149.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.8",
+    "@babel/plugin-transform-runtime": "^7.16.4",
+    "@babel/preset-env": "^7.14.9",
+    "babel-loader": "^8.2.3",
+    "babel-polyfill": "^6.26.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prettier": "^4.2.1",
+    "html-webpack-plugin": "^5.5.0",
+    "prettier": "^2.4.1",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0"
+  },
+  "keywords": [
+    "js",
+    "three.js"
+  ],
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodionbgd/3d-heart.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rodionbgd/3d-heart/issues"
+  },
+  "homepage": "https://github.com/rodionbgd/3d-heart#readme"
+}
