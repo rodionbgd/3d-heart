@@ -6,63 +6,59 @@ class BaseHeart {
         this.startAnimation = true;
         this.scaleThreshold = false;
         this.beatingIncrement = 0.001;
+        this.vertices = [];
+        this.trianglesIndexes = [];
+        this.geo = null;
+        this.scene = null;
+        this.camera = null;
+        this.renderer = null;
+        this.heartMesh = null;
+        this.controls = null;
     }
 
     createScene() {
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100);
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100);
         let z = 30;
-        camera.position.z = z;
-        camera.position.y = 15;
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setClearColor(0xffffff);
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        this.camera.position.z = z;
+        this.camera.position.y = 15;
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setClearColor(0xffffff);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(this.renderer.domElement);
 
         const color = 0xffffff;
         const intensity = 1;
         [...Array(2)].forEach(() => {
             const light = new THREE.SpotLight(color, intensity);
             light.position.set(5, 10, z); //default; light shining from top
-            scene.add(light);
+            this.scene.add(light);
             z = -z;
         });
-
-        return {
-            scene,
-            camera,
-            renderer,
-        };
     }
 
-    createHeartMesh(coordinatesList, trianglesIndexes) {
-        const geo = new THREE.BufferGeometry();
+    createHeartMesh() {
+        this.geo = new THREE.BufferGeometry();
         const vertices = [];
-        trianglesIndexes.forEach((triangle) => {
-            vertices.push(coordinatesList[triangle[0]], coordinatesList[triangle[1]], coordinatesList[triangle[2]]);
+        this.trianglesIndexes.forEach((triangle) => {
+            vertices.push(this.vertices[triangle[0]], this.vertices[triangle[1]], this.vertices[triangle[2]]);
         });
 
-        geo.setFromPoints(vertices);
-        geo.computeVertexNormals();
+        this.geo.setFromPoints(vertices);
+        this.geo.computeVertexNormals();
 
         const material = new THREE.MeshLambertMaterial({ color: 0xff00ff, emissive: 0x00ff });
-        const heartMesh = new THREE.Mesh(geo, material);
-
-        return {
-            geo,
-            material,
-            heartMesh,
-        };
+        this.heartMesh = new THREE.Mesh(this.geo, material);
     }
 
-    addWireFrameToMesh(mesh, geometry) {
-        const wireframe = new THREE.WireframeGeometry(geometry);
+    addWireFrameToMesh() {
+        const wireframe = new THREE.WireframeGeometry(this.geo);
         const lineMat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
         const line = new THREE.LineSegments(wireframe, lineMat);
-        mesh.add(line);
+        this.heartMesh.add(line);
     }
 
-    handleMouseInteraction(camera, scene, meshUuid) {
+    handleMouseInteraction() {
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
@@ -71,51 +67,47 @@ class BaseHeart {
             mouse.x = (coordinatesObject.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(coordinatesObject.clientY / window.innerHeight) * 2 + 1;
 
-            raycaster.setFromCamera(mouse, camera);
+            raycaster.setFromCamera(mouse, this.camera);
 
-            const intersects = raycaster.intersectObjects(scene.children);
-            if (intersects?.length && intersects[0].object?.uuid === meshUuid) {
+            const intersects = raycaster.intersectObjects(this.scene.children);
+            if (intersects?.length && intersects[0].object?.uuid === this.heartMesh.uuid) {
                 this.startAnimation = true;
             }
         }
+
         mouse.x = 1;
         mouse.y = 1;
 
-        return {
-            onMouseInteraction,
-        };
+        document.body.addEventListener("click", (e) => onMouseInteraction.call(this, e), false);
     }
 
-    beatingAnimation(mesh) {
-        if (mesh.scale.x < 1.1 && !this.scaleThreshold) {
-            mesh.scale.x += this.beatingIncrement;
-            mesh.scale.y += this.beatingIncrement;
-            mesh.scale.z += this.beatingIncrement;
-            if (mesh.scale.x >= 1.1) {
+    beatingAnimation() {
+        if (this.heartMesh.scale.x < 1.1 && !this.scaleThreshold) {
+            Object.keys(this.heartMesh.scale).forEach((key) => {
+                this.heartMesh.scale[key] += this.beatingIncrement;
+            });
+            if (this.heartMesh.scale.x >= 1.1) {
                 this.scaleThreshold = true;
             }
         } else if (this.scaleThreshold) {
-            mesh.scale.x -= this.beatingIncrement;
-            mesh.scale.y -= this.beatingIncrement;
-            mesh.scale.z -= this.beatingIncrement;
-            if (mesh.scale.x <= 1) {
+            Object.keys(this.heartMesh.scale).forEach((key) => {
+                this.heartMesh.scale[key] -= this.beatingIncrement;
+            });
+            if (this.heartMesh.scale.x <= 1) {
                 this.scaleThreshold = false;
             }
         }
     }
 
-    setControls(camera, domElement) {
-        if (!camera || !domElement) {
+    setControls(domElement) {
+        if (!this.camera || !domElement) {
             return;
         }
-        const controls = new OrbitControls(camera, domElement);
-        controls.update();
-        return {
-            controls,
-        };
+        this.controls = new OrbitControls(this.camera, domElement);
+        this.controls.update();
     }
     useCoordinates() {
-        const vertices = [
+        this.vertices = [
             new THREE.Vector3(0, 0, 0),
             new THREE.Vector3(0, 5, -1.5),
             new THREE.Vector3(5, 5, 0),
@@ -135,7 +127,7 @@ class BaseHeart {
             new THREE.Vector3(-7, 13, 0),
             new THREE.Vector3(-3, 13, 0),
         ];
-        const trianglesIndexes = [
+        this.trianglesIndexes = [
             // face 1
             [2, 11, 0],
             [2, 3, 4],
@@ -172,34 +164,32 @@ class BaseHeart {
             [16, 17, 14],
             [12, 14, 13],
         ];
-        return {
-            vertices,
-            trianglesIndexes,
+    }
+
+    animate() {
+        const f = () => {
+            this.renderer.render(this.scene, this.camera);
+            this.heartMesh.rotation.y -= 0.01;
+            if (this.startAnimation) {
+                this.beatingAnimation(this.heartMesh);
+            }
+            this.controls.update();
+            requestAnimationFrame(f);
         };
+        requestAnimationFrame(f);
+    }
+
+    init() {
+        this.createScene();
+        this.useCoordinates();
+        this.createHeartMesh();
+        this.scene.add(this.heartMesh);
+        this.addWireFrameToMesh();
+        this.handleMouseInteraction.call(this);
+        this.setControls(this.renderer.domElement);
+        this.animate();
     }
 }
 
-function init() {
-    const baseHeart = new BaseHeart();
-    const { scene, camera, renderer } = baseHeart.createScene();
-    const { vertices, trianglesIndexes } = baseHeart.useCoordinates();
-    const { geo, heartMesh } = baseHeart.createHeartMesh(vertices, trianglesIndexes);
-    scene.add(heartMesh);
-    baseHeart.addWireFrameToMesh(heartMesh, geo);
-
-    const { onMouseInteraction } = baseHeart.handleMouseInteraction(camera, scene, heartMesh.uuid);
-    const { controls } = baseHeart.setControls(camera, renderer.domElement);
-    document.body.addEventListener("click", onMouseInteraction, false);
-    const animate = () => {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-        // heartMesh.rotation.y -= 0.010;
-        if (baseHeart.startAnimation) {
-            baseHeart.beatingAnimation(heartMesh);
-        }
-        controls.update();
-    };
-    animate();
-}
-
-init();
+const baseHeart = new BaseHeart();
+baseHeart.init();
