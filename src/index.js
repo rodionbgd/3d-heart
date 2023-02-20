@@ -1,40 +1,18 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Scene from "./Scene";
 
-class BaseHeart {
+class BaseHeart extends Scene {
     constructor() {
+        super();
         this.startAnimation = true;
         this.scaleThreshold = false;
         this.beatingIncrement = 0.001;
         this.vertices = [];
         this.trianglesIndexes = [];
         this.geo = null;
-        this.scene = null;
-        this.camera = null;
-        this.renderer = null;
         this.heartMesh = null;
         this.controls = null;
-    }
-
-    createScene() {
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100);
-        let z = 30;
-        this.camera.position.z = z;
-        this.camera.position.y = 15;
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setClearColor(0xffffff);
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(this.renderer.domElement);
-
-        const color = 0xffffff;
-        const intensity = 1;
-        [...Array(2)].forEach(() => {
-            const light = new THREE.SpotLight(color, intensity);
-            light.position.set(5, 10, z); //default; light shining from top
-            this.scene.add(light);
-            z = -z;
-        });
     }
 
     createHeartMesh() {
@@ -99,7 +77,8 @@ class BaseHeart {
         }
     }
 
-    setControls(domElement) {
+    setControls() {
+        const { domElement } = this.renderer;
         if (!this.camera || !domElement) {
             return;
         }
@@ -167,16 +146,16 @@ class BaseHeart {
     }
 
     animate() {
-        const f = () => {
+        const animationCb = () => {
             this.renderer.render(this.scene, this.camera);
             this.heartMesh.rotation.y -= 0.01;
             if (this.startAnimation) {
                 this.beatingAnimation(this.heartMesh);
             }
             this.controls.update();
-            requestAnimationFrame(f);
+            requestAnimationFrame(animationCb);
         };
-        requestAnimationFrame(f);
+        requestAnimationFrame(animationCb);
     }
 
     init() {
@@ -186,7 +165,7 @@ class BaseHeart {
         this.scene.add(this.heartMesh);
         this.addWireFrameToMesh();
         this.handleMouseInteraction.call(this);
-        this.setControls(this.renderer.domElement);
+        this.setControls();
         this.animate();
     }
 }
