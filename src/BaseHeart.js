@@ -27,6 +27,7 @@ export default class BaseHeart extends Scene {
 
         const material = new THREE.MeshLambertMaterial({ color: 0xff00ff, emissive: 0x00ff });
         this.heartMesh = new THREE.Mesh(this.geo, material);
+        this.scene.add(this.heartMesh);
     }
 
     addWireFrameToMesh() {
@@ -34,29 +35,6 @@ export default class BaseHeart extends Scene {
         const lineMat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
         const line = new THREE.LineSegments(wireframe, lineMat);
         this.heartMesh.add(line);
-    }
-
-    handleMouseInteraction() {
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        function onMouseInteraction(e) {
-            const coordinatesObject = e.changedTouches ? e.changedTouches[0] : e;
-            mouse.x = (coordinatesObject.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(coordinatesObject.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, this.camera);
-
-            const intersects = raycaster.intersectObjects(this.scene.children);
-            if (intersects?.length && intersects[0].object?.uuid === this.heartMesh.uuid) {
-                this.startAnimation = true;
-            }
-        }
-
-        mouse.x = 1;
-        mouse.y = 1;
-
-        document.body.addEventListener("click", (e) => onMouseInteraction.call(this, e), false);
     }
 
     beatingAnimation() {
@@ -85,27 +63,83 @@ export default class BaseHeart extends Scene {
         this.controls = new OrbitControls(this.camera, domElement);
         this.controls.update();
     }
+
     useCoordinates() {
         this.vertices = [
             new THREE.Vector3(0, 0, 0),
             new THREE.Vector3(0, 5, -1.5),
-            new THREE.Vector3(5, 5, 0),
-            new THREE.Vector3(9, 9, 0),
-            new THREE.Vector3(5, 9, 2),
-            new THREE.Vector3(7, 13, 0),
-            new THREE.Vector3(3, 13, 0),
+            new THREE.Vector3(9, 5, 0),
+            new THREE.Vector3(16.2, 9, 0),
+            new THREE.Vector3(9, 9, 2),
+            new THREE.Vector3(12.6, 13, 0),
+            new THREE.Vector3(5.4, 13, 0),
             new THREE.Vector3(0, 11, 0),
-            new THREE.Vector3(5, 9, -2),
+            new THREE.Vector3(9, 9, -2),
             new THREE.Vector3(0, 8, -3),
             new THREE.Vector3(0, 8, 3),
             new THREE.Vector3(0, 5, 1.5),
-            new THREE.Vector3(-9, 9, 0),
-            new THREE.Vector3(-5, 5, 0),
-            new THREE.Vector3(-5, 9, -2),
-            new THREE.Vector3(-5, 9, 2),
-            new THREE.Vector3(-7, 13, 0),
-            new THREE.Vector3(-3, 13, 0),
+            new THREE.Vector3(-16.2, 9, 0),
+            new THREE.Vector3(-9, 5, 0),
+            new THREE.Vector3(-9, 9, -2),
+            new THREE.Vector3(-9, 9, 2),
+            new THREE.Vector3(-12.6, 13, 0),
+            new THREE.Vector3(-5.4, 13, 0),
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 5, -1.5),
+            new THREE.Vector3(9, 5, 0),
+            new THREE.Vector3(16.2, 9, 0),
+            new THREE.Vector3(9, 9, 2),
+            new THREE.Vector3(12.6, 13, 0),
+            new THREE.Vector3(5.4, 13, 0),
+            new THREE.Vector3(0, 11, 0),
+            new THREE.Vector3(9, 9, -2),
+            new THREE.Vector3(0, 8, -3),
+            new THREE.Vector3(0, 8, 3),
+            new THREE.Vector3(0, 5, 1.5),
+            new THREE.Vector3(-16.2, 9, 0),
+            new THREE.Vector3(-9, 5, 0),
+            new THREE.Vector3(-9, 9, -2),
+            new THREE.Vector3(-9, 9, 2),
+            new THREE.Vector3(-12.6, 13, 0),
+            new THREE.Vector3(-5.4, 13, 0),
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 5, -1.5),
+            new THREE.Vector3(9, 5, 0),
+            new THREE.Vector3(16.2, 9, 0),
+            new THREE.Vector3(9, 9, 2),
+            new THREE.Vector3(12.6, 13, 0),
+            new THREE.Vector3(5.4, 13, 0),
+            new THREE.Vector3(0, 11, 0),
+            new THREE.Vector3(9, 9, -2),
+            new THREE.Vector3(0, 8, -3),
+            new THREE.Vector3(0, 8, 3),
+            new THREE.Vector3(0, 5, 1.5),
+            new THREE.Vector3(-16.2, 9, 0),
+            new THREE.Vector3(-9, 5, 0),
+            new THREE.Vector3(-9, 9, -2),
+            new THREE.Vector3(-9, 9, 2),
+            new THREE.Vector3(-12.6, 13, 0),
+            new THREE.Vector3(-5.4, 13, 0),
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 5, -1.5),
+            new THREE.Vector3(9, 5, 0),
+            new THREE.Vector3(16.2, 9, 0),
+            new THREE.Vector3(9, 9, 2),
+            new THREE.Vector3(12.6, 13, 0),
+            new THREE.Vector3(5.4, 13, 0),
+            new THREE.Vector3(0, 11, 0),
+            new THREE.Vector3(9, 9, -2),
+            new THREE.Vector3(0, 8, -3),
+            new THREE.Vector3(0, 8, 3),
+            new THREE.Vector3(0, 5, 1.5),
+            new THREE.Vector3(-16.2, 9, 0),
+            new THREE.Vector3(-9, 5, 0),
+            new THREE.Vector3(-9, 9, -2),
+            new THREE.Vector3(-9, 9, 2),
+            new THREE.Vector3(-12.6, 13, 0),
+            new THREE.Vector3(-5.4, 13, 0),
         ];
+
         this.trianglesIndexes = [
             // face 1
             [2, 11, 0],
@@ -162,10 +196,12 @@ export default class BaseHeart extends Scene {
         this.createScene();
         this.useCoordinates();
         this.createHeartMesh();
-        this.scene.add(this.heartMesh);
         this.addWireFrameToMesh();
-        this.handleMouseInteraction.call(this);
         this.setControls();
         this.animate();
+    }
+
+    addRoom(room) {
+        room.createRoom(this.scene);
     }
 }

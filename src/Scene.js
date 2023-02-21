@@ -15,8 +15,12 @@ export default class Scene {
         this.camera.position.y = 15;
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setClearColor(0xffffff);
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(this.renderer.domElement);
+        this.renderer.setSize(window.innerWidth / 2, window.innerHeight);
+        const main = document.body.querySelector("main");
+        if (!main) {
+            return;
+        }
+        main.appendChild(this.renderer.domElement);
 
         const color = 0xffffff;
         const intensity = 1;
